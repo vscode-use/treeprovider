@@ -1,17 +1,17 @@
 {
-  "name": "vitesse",
+  "name": "@vscode-use/treeprovider",
   "version": "0.0.0",
   "packageManager": "pnpm@7.2.1",
   "description": "",
   "author": "Simon He",
   "license": "MIT",
   "funding": "https://github.com/sponsors/Simon-He95",
-  "homepage": "https://github.com/Simon-He95/vitesse#readme",
+  "homepage": "https://github.com/Simon-He95/vscode-use/treeprovider#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Simon-He95/vitesse.git"
+    "url": "git+https://github.com/Simon-He95/vscode-use/treeprovider.git"
   },
-  "bugs": "https://github.com/Simon-He95/vitesse/issues",
+  "bugs": "https://github.com/Simon-He95/vscode-use/treeprovider/issues",
   "keywords": [],
   "sideEffects": false,
   "exports": {
@@ -32,15 +32,33 @@
       ]
     }
   },
-  "bin": {
-    "run": "./cli.mjs"
-  },
   "files": [
     "dist"
   ],
+  "engines": {
+    "vscode": "^1.77.0"
+  },
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "todoList",
+          "title": "Daily Planner",
+          "icon": "icon.png"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "calicoColors.colorsView",
+          "name": "Calico Colors"
+        }
+      ]
+    }
+  },
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "postinstall": "simple-git-hooks",
     "build": "tsup ./src/index.ts --format cjs,esm --dts --clean --minify",
     "dev": "npm run build -- --watch src",
     "format": "prettier --write --cache .",
@@ -52,12 +70,10 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "lazy-js-utils": "^0.0.24"
-  },
   "devDependencies": {
     "@antfu/eslint-config": "^0.25.1",
     "@types/node": "^18.0.0",
+    "@types/vscode": "^1.77.0",
     "bumpp": "^8.2.1",
     "eslint": "^8.18.0",
     "esno": "^0.16.3",
@@ -65,15 +81,10 @@
     "picocolors": "^1.0.0",
     "prettier": "^2.8.1",
     "rimraf": "^3.0.2",
-    "simple-git-hooks": "^2.8.1",
     "tsup": "^6.5.0",
     "tsx": "^3.12.1",
     "typescript": "^4.7.4",
     "vitest": "^0.15.1"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "pnpm exec lint-staged --concurrent false",
-    "commit-msg": "pnpm exec tsx scripts/verifyCommit.ts $1"
   },
   "lint-staged": {
     "*": [
