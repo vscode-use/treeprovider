@@ -1,5 +1,5 @@
 <p align="center">
-<img src="./assets/kv.png" alt="vscode-use/registerwebview">
+<img src="./assets/kv.png" alt="vscode-use/treeprovider">
 </p>
 <p align="center"> English | <a href="./README_zh.md">简体中文</a></p>
 
