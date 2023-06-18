@@ -65,6 +65,6 @@ export class TreeProvider implements vscode.TreeDataProvider<any> {
   }
 
   public refresh(): void {
-    this._onDidChangeTreeData.fire()
+    this._onDidChangeTreeData.fire(this.treeData)
   }
 }

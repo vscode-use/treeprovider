@@ -3,7 +3,7 @@
 </p>
 <p align="center"> English | <a href="./README_zh.md">简体中文</a></p>
 
-> WIP: This library is designed to quickly use the tree data provider in the vscode plugin using sidebar trees to make it easier to use
+> WIP: 这个库是为了快速在 vscode 插件中使用 TreeDataProvider 使用侧边栏树，让使用上更加简单
 
 ```code
 import { TreeProvider } from '@vscode-use/treeprovider'
