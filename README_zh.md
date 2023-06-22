@@ -7,24 +7,29 @@
 
 ```code
 import { TreeProvider } from '@vscode-use/treeprovider'
-const provider = new TreeProvider(content)
-const treeItem1 = provider.createTreeItem('tree level 1')
-const treeItem2 = provider.createTreeItem('tree level 2')
-treeItem1.children = [
-   provider.createTreeItem('tree level 1 - 1'),
-   provider.createTreeItem('tree level 1 - 2'),
-]
-treeItem2.children = [
-   provider.createTreeItem('tree level 2 - 1'),
-   provider.createTreeItem('tree level 2 - 2'),
-]
-const treeData = [
-  treeItem1,
-  treeItem2,
-]
-provider.update(treeData)
-vscode.window.registerTreeDataProvider('myTreeView', myTreeDataProvider)
+export function activate(context: vscode.ExtensionContext) {
+  const treeData = [
+    {
+      label: 'label-1',
+      collapsed: true,
+      children: [
+        {
+          label: 'label-1-1'
+        }
+      ]
+    },
+    {
+      label: 'label-2',
+      children: []
+    }
+  ]
+  const provider = new TreeProvider(treeData)
+  context.subscriptions.push(vscode.window.registerTreeDataProvider('example1.id', provider))
+}
+
 ```
+
+[example](/examples/example1)
 
 ## License
 

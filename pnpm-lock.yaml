@@ -7,6 +7,7 @@ importers:
       '@antfu/eslint-config': ^0.25.1
       '@types/node': ^18.0.0
       '@types/vscode': ^1.77.0
+      '@vscode-use/treeprovider': workspace:^0.0.0
       bumpp: ^8.2.1
       eslint: ^8.18.0
       esno: ^0.16.3
@@ -23,6 +24,7 @@ importers:
       '@antfu/eslint-config': 0.25.1_b5e7v2qnwxfo6hmiq56u52mz3e
       '@types/node': 18.0.0
       '@types/vscode': 1.78.1
+      '@vscode-use/treeprovider': 'link:'
       bumpp: 8.2.1
       eslint: 8.18.0
       esno: 0.16.3

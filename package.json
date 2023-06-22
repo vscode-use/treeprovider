@@ -42,25 +42,24 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "todoList",
-          "title": "Daily Planner",
+          "id": "example1",
+          "title": "example1",
           "icon": "icon.png"
         }
       ]
     },
     "views": {
-      "explorer": [
+      "example1": [
         {
-          "type": "webview",
-          "id": "calicoColors.colorsView",
-          "name": "Calico Colors"
+          "id": "example1.id",
+          "name": "example123"
         }
       ]
     }
   },
   "scripts": {
     "build": "tsup ./src/index.ts --format cjs,esm --dts --clean --minify",
-    "dev": "npm run build -- --watch src",
+    "dev": "tsup ./src/index.ts --format cjs,esm --dts --clean --watch src",
     "format": "prettier --write --cache .",
     "lint": "eslint . --ext .vue,.js,.ts,.jsx,.tsx,.md,.json --max-warnings 0 --cache",
     "lint:fix": "pnpm run lint --fix",
@@ -74,6 +73,7 @@
     "@antfu/eslint-config": "^0.25.1",
     "@types/node": "^18.0.0",
     "@types/vscode": "^1.77.0",
+    "@vscode-use/treeprovider": "workspace:^0.0.0",
     "bumpp": "^8.2.1",
     "eslint": "^8.18.0",
     "esno": "^0.16.3",
