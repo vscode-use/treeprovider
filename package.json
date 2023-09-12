@@ -6,12 +6,12 @@
   "author": "Simon He",
   "license": "MIT",
   "funding": "https://github.com/sponsors/Simon-He95",
-  "homepage": "https://github.com/Simon-He95/vscode-use/treeprovider#readme",
+  "homepage": "https://github.com/vscode-use/treeprovider#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Simon-He95/vscode-use/treeprovider.git"
+    "url": "git+https://github.com/vscode-use/treeprovider.git"
   },
-  "bugs": "https://github.com/Simon-He95/vscode-use/treeprovider/issues",
+  "bugs": "https://github.com/vscode-use/treeprovider/issues",
   "keywords": [],
   "sideEffects": false,
   "exports": {
