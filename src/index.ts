@@ -44,6 +44,11 @@ export class TreeProvider implements vscode.TreeDataProvider<any> {
   public refresh(): void {
     this._onDidChangeTreeData.fire(this.treeNodes)
   }
+
+  update(newTreeData: TreeData) {
+    this.treeData = newTreeData
+    this.refresh()
+  }
 }
 
 export function createTreeItem(treeData: TreeData) {
@@ -97,3 +102,40 @@ export function createIconPath(
     dark: vscode.Uri.file(extensionContext.asAbsolutePath(url)),
   }
 }
+
+// export function activate(context: vscode.ExtensionContext) {
+//   const treeData: TreeData = [
+//     {
+//       label: 'label-1',
+//       collapsed: true,
+//       children: [
+//         {
+//           label: 'label-1-1',
+//           command: {
+//             title: 'label-1-1',
+//             command: 'command-1',
+//             arguments: ['1-1']
+//           }
+//         }
+//       ]
+//     },
+//     {
+//       label: 'label-2',
+//       children: [
+//         {
+//           label: 'label-2-1',
+//           command: {
+//             title: 'label-2-1',
+//             command: 'command-1',
+//             arguments: ['2-1']
+//           }
+//         }
+//       ]
+//     }
+//   ]
+//   vscode.commands.registerCommand('command-1',(data)=>{
+//     debugger
+//   })
+//   const provider = new TreeProvider(treeData)
+//   context.subscriptions.push(vscode.window.registerTreeDataProvider('example1.id', provider))
+// }
