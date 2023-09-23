@@ -47,6 +47,7 @@ export class TreeProvider implements vscode.TreeDataProvider<any> {
 
   update(newTreeData: TreeData) {
     this.treeData = newTreeData
+    this.treeNodes = createTreeItem(newTreeData)
     this.refresh()
   }
 }
