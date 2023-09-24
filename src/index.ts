@@ -24,7 +24,6 @@ export class TreeProvider implements vscode.TreeDataProvider<any> {
     = this._onDidChangeTreeData.event
 
   private treeNodes: any = []
-
   constructor(private treeData: TreeData) {}
 
   getChildren(element?: any): vscode.ProviderResult<any[]> {
@@ -43,12 +42,6 @@ export class TreeProvider implements vscode.TreeDataProvider<any> {
 
   public refresh(): void {
     this._onDidChangeTreeData.fire(this.treeNodes)
-  }
-
-  update(newTreeData: TreeData) {
-    this.treeData = newTreeData
-    this.treeNodes = createTreeItem(newTreeData)
-    this.refresh()
   }
 }
 
@@ -104,6 +97,22 @@ export function createIconPath(
   }
 }
 
+export function renderTree(treeData: TreeData, viewId: string) {
+  let treeProvider = new TreeProvider(treeData)
+  let dispose = vscode.window.registerTreeDataProvider(viewId, treeProvider)
+  const unmount = () => dispose.dispose()
+  return {
+    dispose: unmount,
+    update(treeData: TreeData, _viewId: string = viewId) {
+      unmount()
+      setTimeout(() => {
+        treeProvider = new TreeProvider(treeData)
+        dispose = vscode.window.registerTreeDataProvider(_viewId, treeProvider)
+      })
+    },
+  }
+}
+
 // export function activate(context: vscode.ExtensionContext) {
 //   const treeData: TreeData = [
 //     {
@@ -134,9 +143,41 @@ export function createIconPath(
 //       ]
 //     }
 //   ]
-//   vscode.commands.registerCommand('command-1',(data)=>{
+//   vscode.commands.registerCommand('command-1', (data) => {
 //     debugger
 //   })
-//   const provider = new TreeProvider(treeData)
-//   context.subscriptions.push(vscode.window.registerTreeDataProvider('example1.id', provider))
+
+//   // context.subscriptions.push()
+//   const { dispose, update } = renderTree(treeData, 'example1.id')
+//   vscode.commands.registerCommand('refresh-tree', () => {
+//     update([
+//       {
+//         label: 'label-2',
+//         collapsed: true,
+//         children: [
+//           {
+//             label: 'label-2-1',
+//             command: {
+//               title: 'label-2-1',
+//               command: 'command-2',
+//               arguments: ['2-1']
+//             }
+//           }
+//         ]
+//       },
+//       {
+//         label: 'label-3',
+//         children: [
+//           {
+//             label: 'label-3-1',
+//             command: {
+//               title: 'label-3-1',
+//               command: 'command-3',
+//               arguments: ['3-1']
+//             }
+//           }
+//         ]
+//       }
+//     ])
+//   })
 // }

@@ -55,6 +55,10 @@
           "name": "example123"
         }
       ]
+    },
+    "commands": {
+      "title": "refresh tree",
+      "command": "refresh-tree"
     }
   },
   "scripts": {
