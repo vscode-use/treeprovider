@@ -3,7 +3,13 @@
 </p>
 <p align="center"> <a href="./README.md">English</a> | 简体中文</p>
 
-> WIP: 这个库是为了快速在 vscode 插件中使用 TreeDataProvider 使用侧边栏树，让使用上更加简单
+这个库是为了快速在 vscode 插件中使用 TreeDataProvider 使用侧边栏树，让使用上更加简单
+
+## 安装
+
+```
+npm i @vscode-use/treeprovider
+```
 
 ```code
 import { renderTree } from '@vscode-use/treeprovider'
