@@ -28,7 +28,7 @@ export class TreeProvider implements vscode.TreeDataProvider<any> {
 
   getChildren(element?: any): vscode.ProviderResult<any[]> {
     if (element) {
-      return element.children ?? element
+      return element.children ?? []
     }
     else {
       this.treeNodes = createTreeItem(this.treeData)
@@ -50,6 +50,8 @@ export function createTreeItem(treeData: TreeData) {
     const hasChildren = data.children && data.children.length
     if (data.collapsed === undefined && hasChildren)
       data.collapsed = false
+    else if (!hasChildren)
+      data.collapsed = undefined
     const result = create(data) as any
     if (hasChildren)
       result.children = createTreeItem(data.children!) as any
@@ -100,17 +102,27 @@ export function createIconPath(
 export function renderTree(treeData: TreeData, viewId: string) {
   let treeProvider = new TreeProvider(treeData)
   let dispose = vscode.window.registerTreeDataProvider(viewId, treeProvider)
-  const unmount = () => dispose.dispose()
+  const unmount = () => {
+    dispose.dispose()
+    dispose = vscode.window.registerTreeDataProvider(viewId, {
+      getTreeItem: () => null as any,
+      getChildren: () => [],
+    })
+  }
   return {
     dispose: unmount,
     update(treeData: TreeData, _viewId: string = viewId) {
       unmount()
-      setTimeout(() => {
-        treeProvider = new TreeProvider(treeData)
+      treeProvider = new TreeProvider(treeData)
+      nextTick(() => {
         dispose = vscode.window.registerTreeDataProvider(_viewId, treeProvider)
       })
     },
   }
+}
+
+function nextTick(fn: () => void) {
+  return vscode.workspace.applyEdit(new vscode.WorkspaceEdit()).then(fn)
 }
 
 // export function activate(context: vscode.ExtensionContext) {
