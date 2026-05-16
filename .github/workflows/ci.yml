@@ -20,7 +20,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 7.33.7
 
       - name: Set node
         uses: actions/setup-node@v4
@@ -28,14 +28,11 @@ jobs:
           node-version: 18.18.2
           cache: pnpm
 
-      - name: Setup
-        run: npm i -g @antfu/ni
-
       - name: Install
-        run: nci
+        run: pnpm --filter @vscode-use/treeprovider install --frozen-lockfile
 
       - name: Lint
-        run: nr lint
+        run: pnpm run lint
 
   test:
     runs-on: ${{ matrix.os }}
@@ -62,7 +59,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 7.33.7
 
       - name: Set node ${{ matrix.node_version }}
         uses: actions/setup-node@v4
@@ -70,19 +67,14 @@ jobs:
           node-version: ${{ matrix.node_version }}
           cache: pnpm
 
-      - run: corepack enable
-
-      - name: Setup
-        run: npm i -g @antfu/ni
-
       - name: Install
-        run: nci
+        run: pnpm --filter @vscode-use/treeprovider install --frozen-lockfile
 
       - name: Build
-        run: nr build
+        run: pnpm run build
 
       - name: Test
-        run: nr test
+        run: pnpm run test
 
       - name: Typecheck
-        run: nr typecheck
+        run: pnpm run typecheck

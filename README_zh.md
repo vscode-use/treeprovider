@@ -11,46 +11,76 @@
 npm i @vscode-use/treeprovider
 ```
 
-```code
+```ts
+import * as vscode from 'vscode'
 import { renderTree } from '@vscode-use/treeprovider'
-export function activate(context: vscode.ExtensionContext) {
-  const { dispose, update } = renderTree(treeData, 'example1.id')
-  vscode.commands.registerCommand('refresh-tree', () => { // 更新树
-    update([
-      {
-        label: 'label-2',
-        collapsed: true,
-        children: [
-          {
-            label: 'label-2-1',
-            command: {
-              title: 'label-2-1',
-              command: 'command-2',
-              arguments: ['2-1']
-            }
-          }
-        ]
-      },
-      {
-        label: 'label-3',
-        children: [
-          {
-            label: 'label-3-1',
-            command: {
-              title: 'label-3-1',
-              command: 'command-3',
-              arguments: ['3-1']
-            }
-          }
-        ]
-      }
-    ])
-  })
-}
 
+export function activate(context: vscode.ExtensionContext) {
+  const tree = renderTree(treeData, 'example1.id')
+
+  context.subscriptions.push(tree)
+  context.subscriptions.push(
+    vscode.commands.registerCommand('refresh-tree', () => {
+      // 更新树
+      tree.update([
+        {
+          label: 'label-2',
+          collapsed: true,
+          children: [
+            {
+              label: 'label-2-1',
+              command: {
+                title: 'label-2-1',
+                command: 'command-2',
+                arguments: ['2-1'],
+              },
+            },
+          ],
+        },
+        {
+          label: 'label-3',
+          children: [
+            {
+              label: 'label-3-1',
+              command: {
+                title: 'label-3-1',
+                command: 'command-3',
+                arguments: ['3-1'],
+              },
+            },
+          ],
+        },
+      ])
+    }),
+  )
+}
 ```
 
 [example](/examples/example1)
+
+## 树数据
+
+```ts
+interface TreeDataItem {
+  id?: string // 传入稳定且唯一的 id，用于保持展开和选择状态
+  label: string | vscode.TreeItemLabel
+  collapsed?: boolean // true = 折叠，false/undefined = 有 children 时默认展开
+  children?: TreeDataItem[]
+  command?: string | vscode.Command
+  iconPath?: vscode.TreeItem['iconPath']
+  tooltip?: string | vscode.MarkdownString
+  description?: string | boolean
+  contextValue?: string
+  resourceUri?: vscode.Uri
+  accessibilityInformation?: vscode.AccessibilityInformation
+}
+```
+
+没有显式 `id` 的节点不会设置 `item.id`。如果需要在更新后保持展开/选择状态，请为每个业务节点提供稳定且唯一的 `id`。
+
+`renderTree().update(treeData)` 会更新当前 view。已废弃的 `update(treeData, viewId)` 签名会保留兼容，但不再切换 view。需要使用不同的 `viewId` 时，请通过 `renderTree(treeData, nextViewId)` 创建新的 tree。
+
+上面的 `collapsed` 行为适用于 `renderTree()` 和 `createTreeItem()`。`create()` 会直接创建单个 item，并直接使用传入的 `collapsed` 选项。只有传入 `id` 时，节点才会设置 id。
 
 ## License
 

@@ -7,15 +7,11 @@ importers:
       '@antfu/eslint-config': ^0.25.1
       '@types/node': ^18.0.0
       '@types/vscode': ^1.77.0
-      '@vscode-use/treeprovider': workspace:^0.0.0
       bumpp: ^8.2.1
       eslint: ^8.18.0
-      esno: ^0.16.3
       lint-staged: ^13.1.0
-      nanoid: ^4.0.2
       picocolors: ^1.0.0
       prettier: ^2.8.1
-      rimraf: ^3.0.2
       tsup: ^6.5.0
       tsx: ^3.12.1
       typescript: ^4.7.4
@@ -24,15 +20,11 @@ importers:
       '@antfu/eslint-config': 0.25.1_b5e7v2qnwxfo6hmiq56u52mz3e
       '@types/node': 18.0.0
       '@types/vscode': 1.78.1
-      '@vscode-use/treeprovider': 'link:'
       bumpp: 8.2.1
       eslint: 8.18.0
-      esno: 0.16.3
       lint-staged: 13.1.0
-      nanoid: 4.0.2
       picocolors: 1.0.0
       prettier: 2.8.1
-      rimraf: 3.0.2
       tsup: 6.5.0_typescript@4.7.4
       tsx: 3.12.1
       typescript: 4.7.4
@@ -1764,13 +1756,6 @@ packages:
       - supports-color
     dev: true
 
-  /esno/0.16.3:
-    resolution: {integrity: sha512-6slSBEV1lMKcX13DBifvnDFpNno5WXhw4j/ff7RI0y51BZiDqEe5dNhhjhIQ3iCOQuzsm2MbVzmwqbN78BBhPg==}
-    hasBin: true
-    dependencies:
-      tsx: 3.12.1
-    dev: true
-
   /espree/9.3.2:
     resolution: {integrity: sha512-D211tC7ZwouTIuY5x9XnS0E9sWNChB7IYKX/Xp5eQj3nFXhqmiUDB9q27y76oFl8jTg3pXcQx/bpxMfs3CIZbA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
@@ -2553,12 +2538,6 @@ packages:
   /nanoid/3.3.4:
     resolution: {integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
-    hasBin: true
-    dev: true
-
-  /nanoid/4.0.2:
-    resolution: {integrity: sha512-7ZtY5KTCNheRGfEFxnedV5zFiORN1+Y1N6zvPTnHQd8ENUvfaDBeuJDZb2bN/oXwXxu3qkTXDzy57W5vAmDTBw==}
-    engines: {node: ^14 || ^16 || >=18}
     hasBin: true
     dev: true
 

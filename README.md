@@ -11,46 +11,76 @@ This library is designed to quickly use the tree data provider in the vscode plu
 npm i @vscode-use/treeprovider
 ```
 
-```code
+```ts
+import * as vscode from 'vscode'
 import { renderTree } from '@vscode-use/treeprovider'
-export function activate(context: vscode.ExtensionContext) {
-  const { dispose, update } = renderTree(treeData, 'example1.id')
-  vscode.commands.registerCommand('refresh-tree', () => { // Update the tree
-    update([
-      {
-        label: 'label-2',
-        collapsed: true,
-        children: [
-          {
-            label: 'label-2-1',
-            command: {
-              title: 'label-2-1',
-              command: 'command-2',
-              arguments: ['2-1']
-            }
-          }
-        ]
-      },
-      {
-        label: 'label-3',
-        children: [
-          {
-            label: 'label-3-1',
-            command: {
-              title: 'label-3-1',
-              command: 'command-3',
-              arguments: ['3-1']
-            }
-          }
-        ]
-      }
-    ])
-  })
-}
 
+export function activate(context: vscode.ExtensionContext) {
+  const tree = renderTree(treeData, 'example1.id')
+
+  context.subscriptions.push(tree)
+  context.subscriptions.push(
+    vscode.commands.registerCommand('refresh-tree', () => {
+      // Update the tree
+      tree.update([
+        {
+          label: 'label-2',
+          collapsed: true,
+          children: [
+            {
+              label: 'label-2-1',
+              command: {
+                title: 'label-2-1',
+                command: 'command-2',
+                arguments: ['2-1'],
+              },
+            },
+          ],
+        },
+        {
+          label: 'label-3',
+          children: [
+            {
+              label: 'label-3-1',
+              command: {
+                title: 'label-3-1',
+                command: 'command-3',
+                arguments: ['3-1'],
+              },
+            },
+          ],
+        },
+      ])
+    }),
+  )
+}
 ```
 
 [example](/examples/example1)
+
+## Tree data
+
+```ts
+interface TreeDataItem {
+  id?: string // pass a stable, unique id to preserve expansion/selection state
+  label: string | vscode.TreeItemLabel
+  collapsed?: boolean // true = collapsed, false/undefined = expanded when children exist
+  children?: TreeDataItem[]
+  command?: string | vscode.Command
+  iconPath?: vscode.TreeItem['iconPath']
+  tooltip?: string | vscode.MarkdownString
+  description?: string | boolean
+  contextValue?: string
+  resourceUri?: vscode.Uri
+  accessibilityInformation?: vscode.AccessibilityInformation
+}
+```
+
+Items without an explicit `id` leave `item.id` unset. To preserve expansion/selection state across updates, provide a stable and unique `id` for each logical item.
+
+`renderTree().update(treeData)` updates the existing view. The deprecated `update(treeData, viewId)` signature is kept for compatibility, but it no longer switches views. To use a different `viewId`, create a new tree with `renderTree(treeData, nextViewId)`.
+
+The `collapsed` behavior above applies to `renderTree()` and `createTreeItem()`. `create()` creates one item directly and uses the given `collapsed` option directly. Items only get an id when you pass `id`.
 
 ## License
 

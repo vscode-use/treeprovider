@@ -1,7 +1,8 @@
 {
   "name": "@vscode-use/treeprovider",
   "version": "0.0.5",
-  "description": "",
+  "packageManager": "pnpm@7.33.7",
+  "description": "A small helper for rendering VS Code TreeDataProvider views.",
   "author": "Simon He",
   "license": "MIT",
   "funding": "https://github.com/sponsors/Simon-He95",
@@ -11,7 +12,12 @@
     "url": "git+https://github.com/vscode-use/treeprovider.git"
   },
   "bugs": "https://github.com/vscode-use/treeprovider/issues",
-  "keywords": [],
+  "keywords": [
+    "vscode",
+    "treeview",
+    "tree-data-provider",
+    "vscode-extension"
+  ],
   "sideEffects": false,
   "exports": {
     ".": {
@@ -34,53 +40,24 @@
   "files": [
     "dist"
   ],
-  "engines": {
-    "vscode": "^1.77.0"
-  },
-  "contributes": {
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "example1",
-          "title": "example1",
-          "icon": "icon.png"
-        }
-      ]
-    },
-    "views": {
-      "example1": [
-        {
-          "id": "example1.id",
-          "name": "example123"
-        }
-      ]
-    },
-    "commands": {
-      "title": "refresh tree",
-      "command": "refresh-tree"
-    }
-  },
   "scripts": {
-    "build": "tsup ./src/index.ts --format cjs,esm --dts --clean --minify",
-    "dev": "tsup ./src/index.ts --format cjs,esm --dts --clean --watch src",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "format": "prettier --write --cache .",
     "lint": "eslint . --ext .vue,.js,.ts,.jsx,.tsx,.md,.json --max-warnings 0 --cache",
     "lint:fix": "pnpm run lint --fix",
-    "prepublishOnly": "nr build",
+    "prepublishOnly": "pnpm run build",
     "release": "bumpp && npm publish",
-    "start": "esno src/index.ts",
-    "test": "vitest",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.25.1",
     "@types/node": "^18.0.0",
     "@types/vscode": "^1.77.0",
-    "@vscode-use/treeprovider": "workspace:^0.0.0",
     "bumpp": "^8.2.1",
     "eslint": "^8.18.0",
     "lint-staged": "^13.1.0",
-    "nanoid": "^4.0.2",
     "picocolors": "^1.0.0",
     "prettier": "^2.8.1",
     "tsup": "^6.5.0",
