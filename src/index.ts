@@ -166,13 +166,27 @@ export function createIconPath(
 export function renderTree(treeData: TreeData, viewId: string) {
   const provider = new TreeProvider(treeData)
   const disposable = vscode.window.registerTreeDataProvider(viewId, provider)
+  let disposed = false
 
   return {
     dispose() {
+      if (disposed)
+        return
+
+      disposed = true
       disposable.dispose()
       provider.dispose()
     },
-    update(treeData: TreeData) {
+    update(treeData: TreeData, nextViewId?: string) {
+      if (disposed)
+        return
+
+      if (nextViewId && nextViewId !== viewId) {
+        throw new Error(
+          'renderTree().update(treeData, viewId) is no longer supported. Create a new tree with renderTree(treeData, viewId).',
+        )
+      }
+
       provider.update(treeData)
     },
     provider,

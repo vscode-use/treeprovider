@@ -18,7 +18,7 @@ import { renderTree } from '@vscode-use/treeprovider'
 export function activate(context: vscode.ExtensionContext) {
   const tree = renderTree(treeData, 'example1.id')
 
-  context.subscriptions.push({ dispose: tree.dispose })
+  context.subscriptions.push(tree)
   context.subscriptions.push(
     vscode.commands.registerCommand('refresh-tree', () => {
       // Update the tree
@@ -75,7 +75,11 @@ interface TreeDataItem {
 }
 ```
 
-`renderTree().update(treeData)` updates the existing view. To use a different `viewId`, create a new tree with `renderTree(treeData, nextViewId)`.
+When items may be reordered, inserted, or renamed, provide an explicit `id`. The fallback id is only stable while the item order and labels stay unchanged.
+
+`renderTree().update(treeData, viewId?)` updates the existing view. The optional `viewId` argument is kept only for compatibility and must match the current view. To use a different `viewId`, create a new tree with `renderTree(treeData, nextViewId)`.
+
+The `collapsed` behavior above applies to `renderTree()` and `createTreeItem()`. `create()` is a low-level helper and uses the given `collapsed` option directly.
 
 ## License
 

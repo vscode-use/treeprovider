@@ -249,8 +249,33 @@ describe('renderTree', () => {
     expect(children[0].label).toBe('after')
 
     tree.dispose()
+    tree.dispose()
+    tree.update([{ label: 'ignored' }])
+    const childrenAfterDispose = tree.provider.getChildren() as ReturnType<
+      typeof createTreeItem
+    >
 
     expect(vscodeMock.dispose).toHaveBeenCalledTimes(1)
     expect(vscodeMock.eventEmitterDispose).toHaveBeenCalledTimes(1)
+    expect(vscodeMock.fire).toHaveBeenCalledTimes(1)
+    expect(childrenAfterDispose[0].label).toBe('after')
+  })
+
+  it('keeps the legacy update viewId argument only for the same view', () => {
+    const tree = renderTree([{ label: 'before' }], 'example.view')
+
+    expect(() => tree.update([{ label: 'same' }], 'example.view')).not.toThrow()
+    expect(() => tree.update([{ label: 'next' }], 'next.view')).toThrow(
+      'renderTree().update(treeData, viewId) is no longer supported. Create a new tree with renderTree(treeData, viewId).',
+    )
+
+    const children = tree.provider.getChildren() as ReturnType<
+      typeof createTreeItem
+    >
+
+    expect(vscodeMock.registerTreeDataProvider).toHaveBeenCalledTimes(1)
+    expect(children[0].label).toBe('same')
+
+    tree.dispose()
   })
 })
