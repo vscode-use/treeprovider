@@ -5,6 +5,7 @@ import type { TreeData } from '../src/index'
 
 vi.mock('vscode', () => {
   const dispose = vi.fn()
+  const eventEmitterDispose = vi.fn()
   const fire = vi.fn()
   const eventMock = vi.fn()
   const registerTreeDataProvider = vi.fn(() => ({ dispose }))
@@ -34,6 +35,7 @@ vi.mock('vscode', () => {
     EventEmitter: class {
       event = eventMock
       fire = fire
+      dispose = eventEmitterDispose
     },
     window: {
       registerTreeDataProvider,
@@ -44,6 +46,7 @@ vi.mock('vscode', () => {
     __mock: {
       dispose,
       event: eventMock,
+      eventEmitterDispose,
       fire,
       registerTreeDataProvider,
     },
@@ -53,6 +56,7 @@ vi.mock('vscode', () => {
 interface VscodeMock {
   dispose: ReturnType<typeof vi.fn>
   event: ReturnType<typeof vi.fn>
+  eventEmitterDispose: ReturnType<typeof vi.fn>
   fire: ReturnType<typeof vi.fn>
   registerTreeDataProvider: ReturnType<typeof vi.fn>
 }
@@ -62,6 +66,7 @@ const vscodeMock = (vscode as unknown as { __mock: VscodeMock }).__mock
 beforeEach(() => {
   vscodeMock.dispose.mockClear()
   vscodeMock.event.mockClear()
+  vscodeMock.eventEmitterDispose.mockClear()
   vscodeMock.fire.mockClear()
   vscodeMock.registerTreeDataProvider.mockClear()
 })
@@ -159,6 +164,20 @@ describe('createTreeItem', () => {
 })
 
 describe('create', () => {
+  it('uses collapsed option when create is called directly', () => {
+    expect(create({ label: 'root', collapsed: true }).collapsibleState).toBe(
+      vscode.TreeItemCollapsibleState.Collapsed,
+    )
+
+    expect(create({ label: 'root', collapsed: false }).collapsibleState).toBe(
+      vscode.TreeItemCollapsibleState.Expanded,
+    )
+
+    expect(create({ label: 'leaf' }).collapsibleState).toBe(
+      vscode.TreeItemCollapsibleState.None,
+    )
+  })
+
   it('converts string commands to vscode commands', () => {
     const item = create({
       label: 'Run',
@@ -187,6 +206,29 @@ describe('create', () => {
 
     expect(item.command).toBe(command)
   })
+
+  it('copies vscode tree item fields', () => {
+    const iconPath = {
+      light: vscode.Uri.file('/icons/light.svg'),
+      dark: vscode.Uri.file('/icons/dark.svg'),
+    }
+    const resourceUri = vscode.Uri.file('/workspace/file.ts')
+
+    const item = create({
+      label: 'File',
+      iconPath,
+      tooltip: 'Open file',
+      description: 'workspace file',
+      contextValue: 'treeprovider.file',
+      resourceUri,
+    })
+
+    expect(item.iconPath).toBe(iconPath)
+    expect(item.tooltip).toBe('Open file')
+    expect(item.description).toBe('workspace file')
+    expect(item.contextValue).toBe('treeprovider.file')
+    expect(item.resourceUri).toBe(resourceUri)
+  })
 })
 
 describe('renderTree', () => {
@@ -209,5 +251,19 @@ describe('renderTree', () => {
     tree.dispose()
 
     expect(vscodeMock.dispose).toHaveBeenCalledTimes(1)
+    expect(vscodeMock.eventEmitterDispose).toHaveBeenCalledTimes(1)
+  })
+
+  it('throws when update is called with a different view id', () => {
+    const tree = renderTree([{ label: 'before' }], 'example.view')
+
+    expect(() => tree.update([{ label: 'after' }], 'other.view')).toThrow(
+      'Changing viewId is no longer supported. Create a new tree with renderTree().',
+    )
+
+    expect(vscodeMock.registerTreeDataProvider).toHaveBeenCalledTimes(1)
+    expect(vscodeMock.fire).not.toHaveBeenCalled()
+
+    tree.dispose()
   })
 })

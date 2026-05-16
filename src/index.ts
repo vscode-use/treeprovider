@@ -23,7 +23,8 @@ export interface TreeNode extends vscode.TreeItem {
   children?: TreeNode[]
 }
 
-export class TreeProvider implements vscode.TreeDataProvider<TreeNode> {
+export class TreeProvider
+implements vscode.TreeDataProvider<TreeNode>, vscode.Disposable {
   private _onDidChangeTreeData = new vscode.EventEmitter<
     TreeNode | undefined | null | void
   >()
@@ -51,6 +52,10 @@ export class TreeProvider implements vscode.TreeDataProvider<TreeNode> {
   public refresh(): void {
     this._onDidChangeTreeData.fire(undefined)
   }
+
+  public dispose(): void {
+    this._onDidChangeTreeData.dispose()
+  }
 }
 
 export function createTreeItem(treeData: TreeData): TreeNode[] {
@@ -75,7 +80,7 @@ function createTreeItems(treeData: TreeData, parentId = ''): TreeNode[] {
 export function create(
   options: CreateOptions,
   fallbackId = options.label,
-  collapsibleState = vscode.TreeItemCollapsibleState.None,
+  collapsibleState = getCreateCollapsibleState(options),
 ): TreeNode {
   const {
     id,
@@ -124,6 +129,17 @@ export function create(
   return item
 }
 
+function getCreateCollapsibleState(
+  options: Pick<CreateOptions, 'collapsed'>,
+): vscode.TreeItemCollapsibleState {
+  if (options.collapsed === undefined)
+    return vscode.TreeItemCollapsibleState.None
+
+  return options.collapsed
+    ? vscode.TreeItemCollapsibleState.Collapsed
+    : vscode.TreeItemCollapsibleState.Expanded
+}
+
 function getCollapsibleState(
   data: TreeDataItem,
 ): vscode.TreeItemCollapsibleState {
@@ -154,8 +170,15 @@ export function renderTree(treeData: TreeData, viewId: string) {
   return {
     dispose() {
       disposable.dispose()
+      provider.dispose()
     },
-    update(treeData: TreeData) {
+    update(treeData: TreeData, nextViewId = viewId) {
+      if (nextViewId !== viewId) {
+        throw new Error(
+          'Changing viewId is no longer supported. Create a new tree with renderTree().',
+        )
+      }
+
       provider.update(treeData)
     },
     provider,
