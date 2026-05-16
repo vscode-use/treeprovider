@@ -253,17 +253,4 @@ describe('renderTree', () => {
     expect(vscodeMock.dispose).toHaveBeenCalledTimes(1)
     expect(vscodeMock.eventEmitterDispose).toHaveBeenCalledTimes(1)
   })
-
-  it('throws when update is called with a different view id', () => {
-    const tree = renderTree([{ label: 'before' }], 'example.view')
-
-    expect(() => tree.update([{ label: 'after' }], 'other.view')).toThrow(
-      'Changing viewId is no longer supported. Create a new tree with renderTree().',
-    )
-
-    expect(vscodeMock.registerTreeDataProvider).toHaveBeenCalledTimes(1)
-    expect(vscodeMock.fire).not.toHaveBeenCalled()
-
-    tree.dispose()
-  })
 })

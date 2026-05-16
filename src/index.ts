@@ -172,13 +172,7 @@ export function renderTree(treeData: TreeData, viewId: string) {
       disposable.dispose()
       provider.dispose()
     },
-    update(treeData: TreeData, nextViewId = viewId) {
-      if (nextViewId !== viewId) {
-        throw new Error(
-          'Changing viewId is no longer supported. Create a new tree with renderTree().',
-        )
-      }
-
+    update(treeData: TreeData) {
       provider.update(treeData)
     },
     provider,

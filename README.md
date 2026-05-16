@@ -62,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 ```ts
 interface TreeDataItem {
-  id?: string // recommended for stable expansion and selection state
+  id?: string // recommended: stable and unique within the tree
   label: string
   collapsed?: boolean // true = collapsed, false/undefined = expanded when children exist
   children?: TreeDataItem[]

@@ -62,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 ```ts
 interface TreeDataItem {
-  id?: string // 推荐设置，用于稳定展开和选择状态
+  id?: string // 推荐设置：在整棵树中稳定且唯一，用于保持展开和选择状态
   label: string
   collapsed?: boolean // true = 折叠，false/undefined = 有 children 时默认展开
   children?: TreeDataItem[]
