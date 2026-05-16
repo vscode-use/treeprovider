@@ -11,43 +11,49 @@ This library is designed to quickly use the tree data provider in the vscode plu
 npm i @vscode-use/treeprovider
 ```
 
-```code
+```ts
+import * as vscode from 'vscode'
 import { renderTree } from '@vscode-use/treeprovider'
-export function activate(context: vscode.ExtensionContext) {
-  const { dispose, update } = renderTree(treeData, 'example1.id')
-  vscode.commands.registerCommand('refresh-tree', () => { // Update the tree
-    update([
-      {
-        label: 'label-2',
-        collapsed: true,
-        children: [
-          {
-            label: 'label-2-1',
-            command: {
-              title: 'label-2-1',
-              command: 'command-2',
-              arguments: ['2-1']
-            }
-          }
-        ]
-      },
-      {
-        label: 'label-3',
-        children: [
-          {
-            label: 'label-3-1',
-            command: {
-              title: 'label-3-1',
-              command: 'command-3',
-              arguments: ['3-1']
-            }
-          }
-        ]
-      }
-    ])
-  })
-}
 
+export function activate(context: vscode.ExtensionContext) {
+  const tree = renderTree(treeData, 'example1.id')
+
+  context.subscriptions.push({ dispose: tree.dispose })
+  context.subscriptions.push(
+    vscode.commands.registerCommand('refresh-tree', () => {
+      // Update the tree
+      tree.update([
+        {
+          label: 'label-2',
+          collapsed: true,
+          children: [
+            {
+              label: 'label-2-1',
+              command: {
+                title: 'label-2-1',
+                command: 'command-2',
+                arguments: ['2-1'],
+              },
+            },
+          ],
+        },
+        {
+          label: 'label-3',
+          children: [
+            {
+              label: 'label-3-1',
+              command: {
+                title: 'label-3-1',
+                command: 'command-3',
+                arguments: ['3-1'],
+              },
+            },
+          ],
+        },
+      ])
+    }),
+  )
+}
 ```
 
 [example](/examples/example1)

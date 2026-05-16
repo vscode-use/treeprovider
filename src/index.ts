@@ -1,71 +1,94 @@
 import * as vscode from 'vscode'
-import { nanoid } from 'nanoid'
-import type { ThemeIcon, TreeItem, Uri } from 'vscode'
-
-interface Node {
-  key: string
-}
-
-export type TreeData = (CreateOptions & { children?: TreeData })[]
 
 export interface CreateOptions {
+  id?: string
   label: string
+  children?: TreeData
   collapsed?: boolean
   command?: string | vscode.Command
-  iconPath?: Uri | { light: Uri; dark: Uri } | ThemeIcon
+  iconPath?: vscode.TreeItem['iconPath']
+  tooltip?: string | vscode.MarkdownString
+  description?: string | boolean
+  contextValue?: string
+  resourceUri?: vscode.Uri
 }
 
-export class TreeProvider implements vscode.TreeDataProvider<any> {
-  private _onDidChangeTreeData: vscode.EventEmitter<
-    (Node | undefined)[] | undefined
-  > = new vscode.EventEmitter<Node[] | undefined>()
+export type TreeDataItem = CreateOptions
+export type TreeData = TreeDataItem[]
 
-  public onDidChangeTreeData: vscode.Event<any>
-    = this._onDidChangeTreeData.event
+export interface TreeNode extends vscode.TreeItem {
+  raw: TreeDataItem
+  children?: TreeNode[]
+}
 
-  private treeNodes: any = []
+export class TreeProvider implements vscode.TreeDataProvider<TreeNode> {
+  private _onDidChangeTreeData = new vscode.EventEmitter<
+    TreeNode | undefined | null | void
+  >()
+
+  public readonly onDidChangeTreeData = this._onDidChangeTreeData.event
+
   constructor(private treeData: TreeData) {}
 
-  getChildren(element?: any): vscode.ProviderResult<any[]> {
-    if (element) {
+  getChildren(element?: TreeNode): vscode.ProviderResult<TreeNode[]> {
+    if (element)
       return element.children ?? []
-    }
-    else {
-      this.treeNodes = createTreeItem(this.treeData)
-      return this.treeNodes
-    }
+
+    return createTreeItem(this.treeData)
   }
 
-  getTreeItem(element: TreeItem): TreeItem | Thenable<TreeItem> {
+  getTreeItem(element: TreeNode): vscode.TreeItem | Thenable<vscode.TreeItem> {
     return element
   }
 
+  public update(treeData: TreeData): void {
+    this.treeData = treeData
+    this.refresh()
+  }
+
   public refresh(): void {
-    this._onDidChangeTreeData.fire(this.treeNodes)
+    this._onDidChangeTreeData.fire(undefined)
   }
 }
 
-export function createTreeItem(treeData: TreeData) {
-  return treeData.map((data) => {
-    const hasChildren = data.children && data.children.length
-    if (data.collapsed === undefined && hasChildren)
-      data.collapsed = false
-    else if (!hasChildren)
-      data.collapsed = undefined
-    const result = create(data) as any
-    if (hasChildren)
-      result.children = createTreeItem(data.children!) as any
+export function createTreeItem(treeData: TreeData): TreeNode[] {
+  return createTreeItems(treeData)
+}
+
+function createTreeItems(treeData: TreeData, parentId = ''): TreeNode[] {
+  return treeData.map((data, index) => {
+    const fallbackId = parentId
+      ? `${parentId}/${index}:${data.label}`
+      : `${index}:${data.label}`
+    const id = data.id ?? fallbackId
+    const result = create(data, id, getCollapsibleState(data))
+
+    if (data.children?.length)
+      result.children = createTreeItems(data.children, id)
 
     return result
   })
 }
 
-export function create(options: CreateOptions) {
-  const { label, collapsed, command, iconPath } = options
-  const item = new vscode.TreeItem(
+export function create(
+  options: CreateOptions,
+  fallbackId = options.label,
+  collapsibleState = getCollapsibleState(options),
+): TreeNode {
+  const {
+    id,
     label,
-    collapsed === undefined ? 0 : collapsed ? 1 : 2,
-  )
+    command,
+    iconPath,
+    tooltip,
+    description,
+    contextValue,
+    resourceUri,
+  } = options
+  const item = new vscode.TreeItem(label, collapsibleState) as TreeNode
+
+  item.raw = options
+  item.id = id ?? fallbackId
 
   if (command) {
     if (typeof command === 'string') {
@@ -84,9 +107,32 @@ export function create(options: CreateOptions) {
   if (iconPath)
     item.iconPath = iconPath
 
-  item.id = nanoid()
+  if (tooltip !== undefined)
+    item.tooltip = tooltip
+
+  if (description !== undefined)
+    item.description = description
+
+  if (contextValue !== undefined)
+    item.contextValue = contextValue
+
+  if (resourceUri !== undefined)
+    item.resourceUri = resourceUri
 
   return item
+}
+
+function getCollapsibleState(
+  data: CreateOptions,
+): vscode.TreeItemCollapsibleState {
+  const hasChildren = Boolean(data.children?.length)
+
+  if (!hasChildren)
+    return vscode.TreeItemCollapsibleState.None
+
+  return data.collapsed
+    ? vscode.TreeItemCollapsibleState.Collapsed
+    : vscode.TreeItemCollapsibleState.Expanded
 }
 
 export function createIconPath(
@@ -100,29 +146,18 @@ export function createIconPath(
 }
 
 export function renderTree(treeData: TreeData, viewId: string) {
-  let treeProvider = new TreeProvider(treeData)
-  let dispose = vscode.window.registerTreeDataProvider(viewId, treeProvider)
-  const unmount = () => {
-    dispose.dispose()
-    dispose = vscode.window.registerTreeDataProvider(viewId, {
-      getTreeItem: () => null as any,
-      getChildren: () => [],
-    })
-  }
-  return {
-    dispose: unmount,
-    update(treeData: TreeData, _viewId: string = viewId) {
-      unmount()
-      treeProvider = new TreeProvider(treeData)
-      nextTick(() => {
-        dispose = vscode.window.registerTreeDataProvider(_viewId, treeProvider)
-      })
-    },
-  }
-}
+  const provider = new TreeProvider(treeData)
+  const disposable = vscode.window.registerTreeDataProvider(viewId, provider)
 
-function nextTick(fn: () => void) {
-  return vscode.workspace.applyEdit(new vscode.WorkspaceEdit()).then(fn)
+  return {
+    dispose() {
+      disposable.dispose()
+    },
+    update(treeData: TreeData) {
+      provider.update(treeData)
+    },
+    provider,
+  }
 }
 
 // export function activate(context: vscode.ExtensionContext) {

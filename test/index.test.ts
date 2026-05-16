@@ -1,7 +1,207 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import * as vscode from 'vscode'
+import { create, createTreeItem, renderTree } from '../src/index'
+import type { TreeData } from '../src/index'
 
-describe('should', () => {
-  it('exported', () => {
-    expect(1).toEqual(1)
+vi.mock('vscode', () => {
+  const dispose = vi.fn()
+  const fire = vi.fn()
+  const eventMock = vi.fn()
+  const registerTreeDataProvider = vi.fn(() => ({ dispose }))
+
+  return {
+    TreeItem: class {
+      label: string
+      collapsibleState: number | undefined
+      command?: unknown
+      iconPath?: unknown
+      id?: string
+      tooltip?: unknown
+      description?: unknown
+      contextValue?: unknown
+      resourceUri?: unknown
+
+      constructor(label: string, collapsibleState?: number) {
+        this.label = label
+        this.collapsibleState = collapsibleState
+      }
+    },
+    TreeItemCollapsibleState: {
+      None: 0,
+      Collapsed: 1,
+      Expanded: 2,
+    },
+    EventEmitter: class {
+      event = eventMock
+      fire = fire
+    },
+    window: {
+      registerTreeDataProvider,
+    },
+    Uri: {
+      file: (path: string) => ({ fsPath: path }),
+    },
+    __mock: {
+      dispose,
+      event: eventMock,
+      fire,
+      registerTreeDataProvider,
+    },
+  }
+})
+
+interface VscodeMock {
+  dispose: ReturnType<typeof vi.fn>
+  event: ReturnType<typeof vi.fn>
+  fire: ReturnType<typeof vi.fn>
+  registerTreeDataProvider: ReturnType<typeof vi.fn>
+}
+
+const vscodeMock = (vscode as unknown as { __mock: VscodeMock }).__mock
+
+beforeEach(() => {
+  vscodeMock.dispose.mockClear()
+  vscodeMock.event.mockClear()
+  vscodeMock.fire.mockClear()
+  vscodeMock.registerTreeDataProvider.mockClear()
+})
+
+describe('createTreeItem', () => {
+  it('creates vscode tree items with the expected collapsible state', () => {
+    const nodes = createTreeItem([
+      {
+        label: 'expanded',
+        children: [
+          {
+            label: 'leaf',
+          },
+        ],
+      },
+      {
+        label: 'collapsed',
+        collapsed: true,
+        children: [
+          {
+            label: 'child',
+          },
+        ],
+      },
+      {
+        label: 'leaf',
+      },
+    ])
+
+    expect(nodes[0].collapsibleState).toBe(2)
+    expect(nodes[0].children?.[0].collapsibleState).toBe(0)
+    expect(nodes[1].collapsibleState).toBe(1)
+    expect(nodes[2].collapsibleState).toBe(0)
+  })
+
+  it('does not mutate input tree data', () => {
+    const treeData: TreeData = [
+      {
+        label: 'root',
+        children: [
+          {
+            label: 'child',
+          },
+        ],
+      },
+      {
+        label: 'leaf',
+      },
+    ]
+
+    createTreeItem(treeData)
+
+    expect(treeData).toEqual([
+      {
+        label: 'root',
+        children: [
+          {
+            label: 'child',
+          },
+        ],
+      },
+      {
+        label: 'leaf',
+      },
+    ])
+  })
+
+  it('uses stable ids for the same input', () => {
+    const treeData: TreeData = [
+      {
+        id: 'root-id',
+        label: 'root',
+        children: [
+          {
+            label: 'child',
+          },
+        ],
+      },
+    ]
+
+    const first = createTreeItem(treeData)
+    const second = createTreeItem(treeData)
+
+    expect(first[0].id).toBe('root-id')
+    expect(first[0].children?.[0].id).toBe('root-id/0:child')
+    expect(second[0].id).toBe(first[0].id)
+    expect(second[0].children?.[0].id).toBe(first[0].children?.[0].id)
+  })
+})
+
+describe('create', () => {
+  it('converts string commands to vscode commands', () => {
+    const item = create({
+      label: 'Run',
+      command: 'extension.run',
+    })
+
+    expect(item.command).toMatchObject({
+      title: 'Run',
+      tooltip: 'Run',
+      command: 'extension.run',
+    })
+    expect((item.command as vscode.Command).arguments?.[0]).toBe(item)
+  })
+
+  it('keeps command objects unchanged', () => {
+    const command = {
+      title: 'Open',
+      command: 'extension.open',
+      arguments: ['file'],
+    }
+
+    const item = create({
+      label: 'Open',
+      command,
+    })
+
+    expect(item.command).toBe(command)
+  })
+})
+
+describe('renderTree', () => {
+  it('updates provider data without registering a new provider', () => {
+    const tree = renderTree([{ label: 'before' }], 'example.view')
+
+    tree.update([{ label: 'after' }])
+    const children = tree.provider.getChildren() as ReturnType<
+      typeof createTreeItem
+    >
+
+    expect(vscodeMock.registerTreeDataProvider).toHaveBeenCalledTimes(1)
+    expect(vscodeMock.registerTreeDataProvider).toHaveBeenCalledWith(
+      'example.view',
+      tree.provider,
+    )
+    expect(vscodeMock.fire).toHaveBeenCalledWith(undefined)
+    expect(children[0].label).toBe('after')
+
+    tree.dispose()
+
+    expect(vscodeMock.dispose).toHaveBeenCalledTimes(1)
   })
 })

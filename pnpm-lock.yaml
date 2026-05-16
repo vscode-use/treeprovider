@@ -12,7 +12,6 @@ importers:
       eslint: ^8.18.0
       esno: ^0.16.3
       lint-staged: ^13.1.0
-      nanoid: ^4.0.2
       picocolors: ^1.0.0
       prettier: ^2.8.1
       rimraf: ^3.0.2
@@ -29,7 +28,6 @@ importers:
       eslint: 8.18.0
       esno: 0.16.3
       lint-staged: 13.1.0
-      nanoid: 4.0.2
       picocolors: 1.0.0
       prettier: 2.8.1
       rimraf: 3.0.2
@@ -2553,12 +2551,6 @@ packages:
   /nanoid/3.3.4:
     resolution: {integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
-    hasBin: true
-    dev: true
-
-  /nanoid/4.0.2:
-    resolution: {integrity: sha512-7ZtY5KTCNheRGfEFxnedV5zFiORN1+Y1N6zvPTnHQd8ENUvfaDBeuJDZb2bN/oXwXxu3qkTXDzy57W5vAmDTBw==}
-    engines: {node: ^14 || ^16 || >=18}
     hasBin: true
     dev: true
 
