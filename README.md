@@ -75,7 +75,7 @@ interface TreeDataItem {
 }
 ```
 
-When items may be reordered, inserted, or renamed, provide an explicit `id`. The fallback id is only stable while the item order and labels stay unchanged.
+When items may be reordered or inserted, provide an explicit `id`. The fallback id is path-based and is only stable while the item order stays unchanged.
 
 `renderTree().update(treeData)` updates the existing view. To use a different `viewId`, create a new tree with `renderTree(treeData, nextViewId)`.
 

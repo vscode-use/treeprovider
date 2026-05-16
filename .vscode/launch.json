@@ -6,9 +6,11 @@
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-      "preLaunchTask": "npm: dev"
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/examples/example1"
+      ],
+      "outFiles": ["${workspaceFolder}/examples/example1/dist/**/*.js"],
+      "preLaunchTask": "npm: dev - example1"
     }
   ]
 }

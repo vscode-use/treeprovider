@@ -157,7 +157,33 @@ describe('createTreeItem', () => {
     const second = createTreeItem(treeData)
 
     expect(first[0].id).toBe('root-id')
-    expect(first[0].children?.[0].id).toBe('root-id/0:child')
+    expect(first[0].children?.[0].id).toBe('root-id/0')
+    expect(second[0].id).toBe(first[0].id)
+    expect(second[0].children?.[0].id).toBe(first[0].children?.[0].id)
+  })
+
+  it('keeps fallback ids stable when labels change in the same position', () => {
+    const first = createTreeItem([
+      {
+        label: 'before',
+        children: [
+          {
+            label: 'child before',
+          },
+        ],
+      },
+    ])
+    const second = createTreeItem([
+      {
+        label: 'after',
+        children: [
+          {
+            label: 'child after',
+          },
+        ],
+      },
+    ])
+
     expect(second[0].id).toBe(first[0].id)
     expect(second[0].children?.[0].id).toBe(first[0].children?.[0].id)
   })
@@ -277,5 +303,25 @@ describe('renderTree', () => {
     expect(vscodeMock.eventEmitterDispose).toHaveBeenCalledTimes(1)
     expect(vscodeMock.fire).toHaveBeenCalledTimes(1)
     expect(childrenAfterDispose[0].label).toBe('after')
+  })
+
+  it('keeps the legacy viewId parameter for the same view only', () => {
+    const tree = renderTree([{ label: 'before' }], 'example.view')
+
+    tree.update([{ label: 'after' }], 'example.view')
+
+    expect(() => tree.update([{ label: 'other view' }], 'other.view')).toThrow(
+      'renderTree().update(treeData, viewId) is no longer supported. Create a new tree with renderTree(treeData, viewId).',
+    )
+
+    const children = tree.provider.getChildren() as ReturnType<
+      typeof createTreeItem
+    >
+
+    expect(vscodeMock.registerTreeDataProvider).toHaveBeenCalledTimes(1)
+    expect(vscodeMock.fire).toHaveBeenCalledTimes(1)
+    expect(children[0].label).toBe('after')
+
+    tree.dispose()
   })
 })

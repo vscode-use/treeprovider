@@ -75,7 +75,7 @@ interface TreeDataItem {
 }
 ```
 
-如果节点可能重排、插入或改名，建议显式提供 `id`。默认 fallback id 只在节点顺序和 label 不变时保持稳定。
+如果节点可能重排或插入，建议显式提供 `id`。默认 fallback id 基于路径生成，只在节点顺序不变时保持稳定。
 
 `renderTree().update(treeData)` 会更新当前 view。需要使用不同的 `viewId` 时，请通过 `renderTree(treeData, nextViewId)` 创建新的 tree。
 

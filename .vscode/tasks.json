@@ -5,7 +5,9 @@
   "tasks": [
     {
       "type": "npm",
+      "label": "npm: dev - example1",
       "script": "dev",
+      "path": "examples/example1",
       "isBackground": true,
       "presentation": {
         "reveal": "never"
