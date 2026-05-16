@@ -91,10 +91,16 @@ describe('createTreeItem', () => {
       },
     ])
 
-    expect(nodes[0].collapsibleState).toBe(2)
-    expect(nodes[0].children?.[0].collapsibleState).toBe(0)
-    expect(nodes[1].collapsibleState).toBe(1)
-    expect(nodes[2].collapsibleState).toBe(0)
+    expect(nodes[0].collapsibleState).toBe(
+      vscode.TreeItemCollapsibleState.Expanded,
+    )
+    expect(nodes[0].children?.[0].collapsibleState).toBe(
+      vscode.TreeItemCollapsibleState.None,
+    )
+    expect(nodes[1].collapsibleState).toBe(
+      vscode.TreeItemCollapsibleState.Collapsed,
+    )
+    expect(nodes[2].collapsibleState).toBe(vscode.TreeItemCollapsibleState.None)
   })
 
   it('does not mutate input tree data', () => {

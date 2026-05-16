@@ -58,6 +58,25 @@ export function activate(context: vscode.ExtensionContext) {
 
 [example](/examples/example1)
 
+## 树数据
+
+```ts
+interface TreeDataItem {
+  id?: string // 推荐设置，用于稳定展开和选择状态
+  label: string
+  collapsed?: boolean // true = 折叠，false/undefined = 有 children 时默认展开
+  children?: TreeDataItem[]
+  command?: string | vscode.Command
+  iconPath?: vscode.TreeItem['iconPath']
+  tooltip?: string | vscode.MarkdownString
+  description?: string | boolean
+  contextValue?: string
+  resourceUri?: vscode.Uri
+}
+```
+
+`renderTree().update(treeData)` 会更新当前 view。需要使用不同的 `viewId` 时，请通过 `renderTree(treeData, nextViewId)` 创建新的 tree。
+
 ## License
 
 [MIT](./LICENSE) License © 2022 [Simon He](https://github.com/Simon-He95)

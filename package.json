@@ -1,6 +1,7 @@
 {
   "name": "@vscode-use/treeprovider",
   "version": "0.0.5",
+  "packageManager": "pnpm@7.33.7",
   "description": "A small helper for rendering VS Code TreeDataProvider views.",
   "author": "Simon He",
   "license": "MIT",
@@ -55,7 +56,6 @@
     "@antfu/eslint-config": "^0.25.1",
     "@types/node": "^18.0.0",
     "@types/vscode": "^1.77.0",
-    "@vscode-use/treeprovider": "workspace:^0.0.0",
     "bumpp": "^8.2.1",
     "eslint": "^8.18.0",
     "lint-staged": "^13.1.0",

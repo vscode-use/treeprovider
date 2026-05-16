@@ -58,6 +58,25 @@ export function activate(context: vscode.ExtensionContext) {
 
 [example](/examples/example1)
 
+## Tree data
+
+```ts
+interface TreeDataItem {
+  id?: string // recommended for stable expansion and selection state
+  label: string
+  collapsed?: boolean // true = collapsed, false/undefined = expanded when children exist
+  children?: TreeDataItem[]
+  command?: string | vscode.Command
+  iconPath?: vscode.TreeItem['iconPath']
+  tooltip?: string | vscode.MarkdownString
+  description?: string | boolean
+  contextValue?: string
+  resourceUri?: vscode.Uri
+}
+```
+
+`renderTree().update(treeData)` updates the existing view. To use a different `viewId`, create a new tree with `renderTree(treeData, nextViewId)`.
+
 ## License
 
 [MIT](./LICENSE) License © 2022 [Simon He](https://github.com/Simon-He95)
