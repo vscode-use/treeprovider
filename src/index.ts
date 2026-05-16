@@ -3,7 +3,6 @@ import * as vscode from 'vscode'
 export interface CreateOptions {
   id?: string
   label: string
-  children?: TreeData
   collapsed?: boolean
   command?: string | vscode.Command
   iconPath?: vscode.TreeItem['iconPath']
@@ -13,7 +12,10 @@ export interface CreateOptions {
   resourceUri?: vscode.Uri
 }
 
-export type TreeDataItem = CreateOptions
+export interface TreeDataItem extends CreateOptions {
+  children?: TreeData
+}
+
 export type TreeData = TreeDataItem[]
 
 export interface TreeNode extends vscode.TreeItem {
@@ -73,7 +75,7 @@ function createTreeItems(treeData: TreeData, parentId = ''): TreeNode[] {
 export function create(
   options: CreateOptions,
   fallbackId = options.label,
-  collapsibleState = getCollapsibleState(options),
+  collapsibleState = vscode.TreeItemCollapsibleState.None,
 ): TreeNode {
   const {
     id,
@@ -123,7 +125,7 @@ export function create(
 }
 
 function getCollapsibleState(
-  data: CreateOptions,
+  data: TreeDataItem,
 ): vscode.TreeItemCollapsibleState {
   const hasChildren = Boolean(data.children?.length)
 
@@ -159,72 +161,3 @@ export function renderTree(treeData: TreeData, viewId: string) {
     provider,
   }
 }
-
-// export function activate(context: vscode.ExtensionContext) {
-//   const treeData: TreeData = [
-//     {
-//       label: 'label-1',
-//       collapsed: true,
-//       children: [
-//         {
-//           label: 'label-1-1',
-//           command: {
-//             title: 'label-1-1',
-//             command: 'command-1',
-//             arguments: ['1-1']
-//           }
-//         }
-//       ]
-//     },
-//     {
-//       label: 'label-2',
-//       children: [
-//         {
-//           label: 'label-2-1',
-//           command: {
-//             title: 'label-2-1',
-//             command: 'command-1',
-//             arguments: ['2-1']
-//           }
-//         }
-//       ]
-//     }
-//   ]
-//   vscode.commands.registerCommand('command-1', (data) => {
-//     debugger
-//   })
-
-//   // context.subscriptions.push()
-//   const { dispose, update } = renderTree(treeData, 'example1.id')
-//   vscode.commands.registerCommand('refresh-tree', () => {
-//     update([
-//       {
-//         label: 'label-2',
-//         collapsed: true,
-//         children: [
-//           {
-//             label: 'label-2-1',
-//             command: {
-//               title: 'label-2-1',
-//               command: 'command-2',
-//               arguments: ['2-1']
-//             }
-//           }
-//         ]
-//       },
-//       {
-//         label: 'label-3',
-//         children: [
-//           {
-//             label: 'label-3-1',
-//             command: {
-//               title: 'label-3-1',
-//               command: 'command-3',
-//               arguments: ['3-1']
-//             }
-//           }
-//         ]
-//       }
-//     ])
-//   })
-// }
