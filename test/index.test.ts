@@ -194,6 +194,14 @@ describe('create', () => {
     expect(create({ id: 'item-id', label: 'Item' }).id).toBe('item-id')
   })
 
+  it('does not create a fallback id when called directly', () => {
+    expect(create({ label: 'Item' }).id).toBeUndefined()
+  })
+
+  it('uses fallback id when provided', () => {
+    expect(create({ label: 'Item' }, 'fallback-id').id).toBe('fallback-id')
+  })
+
   it('uses collapsed option when create is called directly', () => {
     expect(create({ label: 'root', collapsed: true }).collapsibleState).toBe(
       vscode.TreeItemCollapsibleState.Collapsed,
@@ -303,25 +311,5 @@ describe('renderTree', () => {
     expect(vscodeMock.eventEmitterDispose).toHaveBeenCalledTimes(1)
     expect(vscodeMock.fire).toHaveBeenCalledTimes(1)
     expect(childrenAfterDispose[0].label).toBe('after')
-  })
-
-  it('keeps the legacy viewId parameter for the same view only', () => {
-    const tree = renderTree([{ label: 'before' }], 'example.view')
-
-    tree.update([{ label: 'after' }], 'example.view')
-
-    expect(() => tree.update([{ label: 'other view' }], 'other.view')).toThrow(
-      'renderTree().update(treeData, viewId) is no longer supported. Create a new tree with renderTree(treeData, viewId).',
-    )
-
-    const children = tree.provider.getChildren() as ReturnType<
-      typeof createTreeItem
-    >
-
-    expect(vscodeMock.registerTreeDataProvider).toHaveBeenCalledTimes(1)
-    expect(vscodeMock.fire).toHaveBeenCalledTimes(1)
-    expect(children[0].label).toBe('after')
-
-    tree.dispose()
   })
 })

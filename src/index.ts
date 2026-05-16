@@ -24,7 +24,7 @@ export interface TreeNode extends vscode.TreeItem {
 }
 
 export interface RenderTreeResult extends vscode.Disposable {
-  update(treeData: TreeData, viewId?: string): void
+  update(treeData: TreeData): void
   provider: TreeProvider
 }
 
@@ -82,7 +82,7 @@ function createTreeItems(treeData: TreeData, parentId = ''): TreeNode[] {
 
 export function create(
   options: CreateOptions,
-  fallbackId = options.label,
+  fallbackId?: string,
   collapsibleState = getCreateCollapsibleState(options),
 ): TreeNode {
   const {
@@ -98,7 +98,10 @@ export function create(
   const item = new vscode.TreeItem(label, collapsibleState) as TreeNode
 
   item.raw = options
-  item.id = id ?? fallbackId
+
+  const itemId = id ?? fallbackId
+  if (itemId !== undefined)
+    item.id = itemId
 
   if (command) {
     if (typeof command === 'string') {
@@ -183,15 +186,9 @@ export function renderTree(
       disposable.dispose()
       provider.dispose()
     },
-    update(treeData: TreeData, nextViewId?: string) {
+    update(treeData: TreeData) {
       if (disposed)
         return
-
-      if (nextViewId && nextViewId !== viewId) {
-        throw new Error(
-          'renderTree().update(treeData, viewId) is no longer supported. Create a new tree with renderTree(treeData, viewId).',
-        )
-      }
 
       provider.update(treeData)
     },

@@ -79,7 +79,7 @@ interface TreeDataItem {
 
 `renderTree().update(treeData)` 会更新当前 view。需要使用不同的 `viewId` 时，请通过 `renderTree(treeData, nextViewId)` 创建新的 tree。
 
-上面的 `collapsed` 行为适用于 `renderTree()` 和 `createTreeItem()`。`create()` 是低层 helper，会直接使用传入的 `collapsed` 选项。如果直接调用 `create()` 且多个 item 可能共用同一个 label，请传入 `id`。
+上面的 `collapsed` 行为适用于 `renderTree()` 和 `createTreeItem()`。`create()` 是低层 helper，会直接使用传入的 `collapsed` 选项。只有传入 `id` 或内部 fallback id 时，它才会设置 id。
 
 ## License
 

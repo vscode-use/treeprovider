@@ -79,7 +79,7 @@ When items may be reordered or inserted, provide an explicit `id`. The fallback 
 
 `renderTree().update(treeData)` updates the existing view. To use a different `viewId`, create a new tree with `renderTree(treeData, nextViewId)`.
 
-The `collapsed` behavior above applies to `renderTree()` and `createTreeItem()`. `create()` is a low-level helper and uses the given `collapsed` option directly. Pass `id` when calling `create()` directly for multiple items that can share the same label.
+The `collapsed` behavior above applies to `renderTree()` and `createTreeItem()`. `create()` is a low-level helper and uses the given `collapsed` option directly. It only assigns an id when you pass `id` or an internal fallback id.
 
 ## License
 
