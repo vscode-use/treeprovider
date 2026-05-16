@@ -3,7 +3,7 @@
   "name": "example1",
   "displayName": "example1",
   "version": "0.0.0",
-  "packageManager": "pnpm@8.1.1",
+  "packageManager": "pnpm@8.15.9",
   "description": "example1",
   "author": "Simon He <https://github.com/Simon-He95>",
   "categories": [
@@ -14,7 +14,7 @@
     "dist"
   ],
   "engines": {
-    "vscode": "^1.77.0"
+    "vscode": "^1.120.0"
   },
   "activationEvents": [
     "onStartupFinished"
@@ -51,27 +51,27 @@
     "release": "bumpp && pnpm run publish"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.38.4",
-    "@types/koa": "^2.13.6",
-    "@types/koa-router": "^7.4.4",
-    "@types/node": "^18.15.11",
-    "@types/vscode": "^1.77.0",
+    "@antfu/eslint-config": "^0.38.6",
+    "@types/koa": "^2.15.1",
+    "@types/koa-router": "^7.4.9",
+    "@types/node": "^18.19.130",
+    "@types/vscode": "^1.120.0",
     "@vscode-use/createwebview": "^0.0.8",
     "@vscode-use/registerwebview": "^0.0.2",
     "@vscode-use/utils": "^0.0.18",
     "anthropic-ai": "^0.0.8",
-    "bumpp": "^9.1.0",
+    "bumpp": "^9.11.1",
     "eslint": "^8.37.0",
     "esno": "^0.16.3",
-    "koa": "^2.14.2",
+    "koa": "^2.16.4",
     "koa-router": "^12.0.0",
     "nanoid": "^4.0.2",
-    "pnpm": "^8.1.1",
+    "pnpm": "^8.15.9",
     "rimraf": "^4.4.1",
     "tsup": "^6.7.0",
-    "typescript": "^5.0.3",
+    "typescript": "^5.9.3",
     "uuid": "^9.0.0",
-    "vite": "^4.2.1",
+    "vite": "^4.5.14",
     "vitest": "^0.29.8",
     "vsce": "^2.15.0"
   }
