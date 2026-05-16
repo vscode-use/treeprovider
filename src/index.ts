@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 
 export interface CreateOptions {
   id?: string
-  label: string
+  label: string | vscode.TreeItemLabel
   collapsed?: boolean
   command?: string | vscode.Command
   iconPath?: vscode.TreeItem['iconPath']
@@ -10,6 +10,7 @@ export interface CreateOptions {
   description?: string | boolean
   contextValue?: string
   resourceUri?: vscode.Uri
+  accessibilityInformation?: vscode.AccessibilityInformation
 }
 
 export interface TreeDataItem extends CreateOptions {
@@ -113,6 +114,7 @@ function createNode(
     description,
     contextValue,
     resourceUri,
+    accessibilityInformation,
   } = options
   const item = new vscode.TreeItem(label, collapsibleState) as TreeNode
 
@@ -124,9 +126,11 @@ function createNode(
 
   if (command) {
     if (typeof command === 'string') {
+      const commandTitle = typeof label === 'string' ? label : label.label
+
       item.command = {
-        title: label,
-        tooltip: label,
+        title: commandTitle,
+        tooltip: commandTitle,
         command,
         arguments: [item],
       }
@@ -150,6 +154,9 @@ function createNode(
 
   if (resourceUri !== undefined)
     item.resourceUri = resourceUri
+
+  if (accessibilityInformation !== undefined)
+    item.accessibilityInformation = accessibilityInformation
 
   return item
 }
@@ -213,7 +220,6 @@ export function renderTree(
         console.warn(
           'renderTree().update(treeData, viewId) no longer switches views. Create a new tree with renderTree(treeData, viewId) instead.',
         )
-        return
       }
 
       provider.update(treeData)

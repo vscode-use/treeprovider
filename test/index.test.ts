@@ -12,7 +12,7 @@ vi.mock('vscode', () => {
 
   return {
     TreeItem: class {
-      label: string
+      label: string | vscode.TreeItemLabel
       collapsibleState: number | undefined
       command?: unknown
       iconPath?: unknown
@@ -21,8 +21,12 @@ vi.mock('vscode', () => {
       description?: unknown
       contextValue?: unknown
       resourceUri?: unknown
+      accessibilityInformation?: unknown
 
-      constructor(label: string, collapsibleState?: number) {
+      constructor(
+        label: string | vscode.TreeItemLabel,
+        collapsibleState?: number,
+      ) {
         this.label = label
         this.collapsibleState = collapsibleState
       }
@@ -246,6 +250,20 @@ describe('create', () => {
     expect((item.command as vscode.Command).arguments?.[0]).toBe(item)
   })
 
+  it('uses the text from TreeItemLabel for string command titles', () => {
+    const item = create({
+      label: { label: 'Highlighted', highlights: [[0, 4]] },
+      command: 'extension.run',
+    })
+
+    expect(item.label).toEqual({ label: 'Highlighted', highlights: [[0, 4]] })
+    expect(item.command).toMatchObject({
+      title: 'Highlighted',
+      tooltip: 'Highlighted',
+      command: 'extension.run',
+    })
+  })
+
   it('keeps command objects unchanged', () => {
     const command = {
       title: 'Open',
@@ -267,6 +285,10 @@ describe('create', () => {
       dark: vscode.Uri.file('/icons/dark.svg'),
     }
     const resourceUri = vscode.Uri.file('/workspace/file.ts')
+    const accessibilityInformation = {
+      label: 'File item',
+      role: 'treeitem',
+    }
 
     const item = create({
       label: 'File',
@@ -275,6 +297,7 @@ describe('create', () => {
       description: 'workspace file',
       contextValue: 'treeprovider.file',
       resourceUri,
+      accessibilityInformation,
     })
 
     expect(item.iconPath).toBe(iconPath)
@@ -282,6 +305,7 @@ describe('create', () => {
     expect(item.description).toBe('workspace file')
     expect(item.contextValue).toBe('treeprovider.file')
     expect(item.resourceUri).toBe(resourceUri)
+    expect(item.accessibilityInformation).toBe(accessibilityInformation)
   })
 })
 
@@ -343,7 +367,7 @@ describe('renderTree', () => {
     expect(childrenAfterDispose[0].label).toBe('after')
   })
 
-  it('keeps the deprecated update viewId argument from switching views', () => {
+  it('keeps the deprecated update viewId argument from switching views while updating data', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     const tree = renderTree([{ label: 'before' }], 'example.view')
 
@@ -353,8 +377,8 @@ describe('renderTree', () => {
     >
 
     expect(vscodeMock.registerTreeDataProvider).toHaveBeenCalledTimes(1)
-    expect(vscodeMock.fire).not.toHaveBeenCalled()
-    expect(children[0].label).toBe('before')
+    expect(vscodeMock.fire).toHaveBeenCalledWith(undefined)
+    expect(children[0].label).toBe('after')
     expect(warn).toHaveBeenCalledWith(
       'renderTree().update(treeData, viewId) no longer switches views. Create a new tree with renderTree(treeData, viewId) instead.',
     )

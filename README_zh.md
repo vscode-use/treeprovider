@@ -63,7 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
 ```ts
 interface TreeDataItem {
   id?: string // 推荐设置：在整棵树中稳定且唯一，用于保持展开和选择状态
-  label: string
+  label: string | vscode.TreeItemLabel
   collapsed?: boolean // true = 折叠，false/undefined = 有 children 时默认展开
   children?: TreeDataItem[]
   command?: string | vscode.Command
@@ -72,10 +72,11 @@ interface TreeDataItem {
   description?: string | boolean
   contextValue?: string
   resourceUri?: vscode.Uri
+  accessibilityInformation?: vscode.AccessibilityInformation
 }
 ```
 
-如果节点可能重排或插入，建议显式提供 `id`。内部 fallback id 基于路径生成，只在节点顺序不变时保持稳定。
+内部 fallback id 跟随节点位置，而不是业务对象身份。如果节点会插入、删除、排序或移动，请务必提供显式 `id`，否则展开/选择状态可能恢复到错误的节点上。
 
 `renderTree().update(treeData)` 会更新当前 view。已废弃的 `update(treeData, viewId)` 签名会保留兼容，但不再切换 view。需要使用不同的 `viewId` 时，请通过 `renderTree(treeData, nextViewId)` 创建新的 tree。
 

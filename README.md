@@ -63,7 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
 ```ts
 interface TreeDataItem {
   id?: string // recommended: stable and unique within the tree
-  label: string
+  label: string | vscode.TreeItemLabel
   collapsed?: boolean // true = collapsed, false/undefined = expanded when children exist
   children?: TreeDataItem[]
   command?: string | vscode.Command
@@ -72,10 +72,11 @@ interface TreeDataItem {
   description?: string | boolean
   contextValue?: string
   resourceUri?: vscode.Uri
+  accessibilityInformation?: vscode.AccessibilityInformation
 }
 ```
 
-When items may be reordered or inserted, provide an explicit `id`. The internal fallback id is path-based and is only stable while the item order stays unchanged.
+The fallback id follows the node position, not the logical item identity. If items can be inserted, removed, sorted, or moved, always provide an explicit `id`; otherwise expansion/selection state may be restored onto the wrong item.
 
 `renderTree().update(treeData)` updates the existing view. The deprecated `update(treeData, viewId)` signature is kept for compatibility, but it no longer switches views. To use a different `viewId`, create a new tree with `renderTree(treeData, nextViewId)`.
 
