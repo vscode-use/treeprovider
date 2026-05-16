@@ -1,6 +1,6 @@
 {
   "name": "@vscode-use/treeprovider",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "packageManager": "pnpm@7.33.7",
   "description": "A small helper for rendering VS Code TreeDataProvider views.",
   "author": "Simon He",
