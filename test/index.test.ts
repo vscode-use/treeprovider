@@ -157,9 +157,29 @@ describe('createTreeItem', () => {
     const second = createTreeItem(treeData)
 
     expect(first[0].id).toBe('root-id')
-    expect(first[0].children?.[0].id).toBe('root-id/0')
+    expect(first[0].children?.[0].id).toBe('__vscode_use_treeprovider__:0/0')
     expect(second[0].id).toBe(first[0].id)
     expect(second[0].children?.[0].id).toBe(first[0].children?.[0].id)
+  })
+
+  it('keeps fallback ids out of the explicit id namespace', () => {
+    const nodes = createTreeItem([
+      {
+        label: 'root',
+        children: [
+          {
+            label: 'child',
+          },
+        ],
+      },
+      {
+        id: '0/0',
+        label: 'another item',
+      },
+    ])
+
+    expect(nodes[0].children?.[0].id).toBe('__vscode_use_treeprovider__:0/0')
+    expect(nodes[1].id).toBe('0/0')
   })
 
   it('keeps fallback ids stable when labels change in the same position', () => {
@@ -196,10 +216,6 @@ describe('create', () => {
 
   it('does not create a fallback id when called directly', () => {
     expect(create({ label: 'Item' }).id).toBeUndefined()
-  })
-
-  it('uses fallback id when provided', () => {
-    expect(create({ label: 'Item' }, 'fallback-id').id).toBe('fallback-id')
   })
 
   it('uses collapsed option when create is called directly', () => {
@@ -281,6 +297,20 @@ describe('TreeProvider', () => {
 
     provider.dispose()
   })
+
+  it('ignores updates and refreshes after dispose', () => {
+    const provider = new TreeProvider([{ label: 'before' }])
+
+    provider.dispose()
+    provider.dispose()
+    provider.update([{ label: 'after' }])
+    provider.refresh()
+    const children = provider.getChildren() as ReturnType<typeof createTreeItem>
+
+    expect(vscodeMock.eventEmitterDispose).toHaveBeenCalledTimes(1)
+    expect(vscodeMock.fire).not.toHaveBeenCalled()
+    expect(children[0].label).toBe('before')
+  })
 })
 
 describe('renderTree', () => {
@@ -311,5 +341,25 @@ describe('renderTree', () => {
     expect(vscodeMock.eventEmitterDispose).toHaveBeenCalledTimes(1)
     expect(vscodeMock.fire).toHaveBeenCalledTimes(1)
     expect(childrenAfterDispose[0].label).toBe('after')
+  })
+
+  it('keeps the deprecated update viewId argument from switching views', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const tree = renderTree([{ label: 'before' }], 'example.view')
+
+    tree.update([{ label: 'after' }], 'other.view')
+    const children = tree.provider.getChildren() as ReturnType<
+      typeof createTreeItem
+    >
+
+    expect(vscodeMock.registerTreeDataProvider).toHaveBeenCalledTimes(1)
+    expect(vscodeMock.fire).not.toHaveBeenCalled()
+    expect(children[0].label).toBe('before')
+    expect(warn).toHaveBeenCalledWith(
+      'renderTree().update(treeData, viewId) no longer switches views. Create a new tree with renderTree(treeData, viewId) instead.',
+    )
+
+    tree.dispose()
+    warn.mockRestore()
   })
 })

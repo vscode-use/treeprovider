@@ -75,11 +75,11 @@ interface TreeDataItem {
 }
 ```
 
-When items may be reordered or inserted, provide an explicit `id`. The fallback id is path-based and is only stable while the item order stays unchanged.
+When items may be reordered or inserted, provide an explicit `id`. The internal fallback id is path-based and is only stable while the item order stays unchanged.
 
-`renderTree().update(treeData)` updates the existing view. To use a different `viewId`, create a new tree with `renderTree(treeData, nextViewId)`.
+`renderTree().update(treeData)` updates the existing view. The deprecated `update(treeData, viewId)` signature is kept for compatibility, but it no longer switches views. To use a different `viewId`, create a new tree with `renderTree(treeData, nextViewId)`.
 
-The `collapsed` behavior above applies to `renderTree()` and `createTreeItem()`. `create()` is a low-level helper and uses the given `collapsed` option directly. It only assigns an id when you pass `id` or an internal fallback id.
+The `collapsed` behavior above applies to `renderTree()` and `createTreeItem()`. `create()` creates one item directly and uses the given `collapsed` option directly. It only assigns an id when you pass `id`.
 
 ## License
 

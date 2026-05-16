@@ -75,11 +75,11 @@ interface TreeDataItem {
 }
 ```
 
-如果节点可能重排或插入，建议显式提供 `id`。默认 fallback id 基于路径生成，只在节点顺序不变时保持稳定。
+如果节点可能重排或插入，建议显式提供 `id`。内部 fallback id 基于路径生成，只在节点顺序不变时保持稳定。
 
-`renderTree().update(treeData)` 会更新当前 view。需要使用不同的 `viewId` 时，请通过 `renderTree(treeData, nextViewId)` 创建新的 tree。
+`renderTree().update(treeData)` 会更新当前 view。已废弃的 `update(treeData, viewId)` 签名会保留兼容，但不再切换 view。需要使用不同的 `viewId` 时，请通过 `renderTree(treeData, nextViewId)` 创建新的 tree。
 
-上面的 `collapsed` 行为适用于 `renderTree()` 和 `createTreeItem()`。`create()` 是低层 helper，会直接使用传入的 `collapsed` 选项。只有传入 `id` 或内部 fallback id 时，它才会设置 id。
+上面的 `collapsed` 行为适用于 `renderTree()` 和 `createTreeItem()`。`create()` 会直接创建单个 item，并直接使用传入的 `collapsed` 选项。只有传入 `id` 时，它才会设置 id。
 
 ## License
 

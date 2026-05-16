@@ -24,7 +24,7 @@ export interface TreeNode extends vscode.TreeItem {
 }
 
 export interface RenderTreeResult extends vscode.Disposable {
-  update(treeData: TreeData): void
+  update(treeData: TreeData, viewId?: string): void
   provider: TreeProvider
 }
 
@@ -33,6 +33,8 @@ implements vscode.TreeDataProvider<TreeNode>, vscode.Disposable {
   private _onDidChangeTreeData = new vscode.EventEmitter<
     TreeNode | undefined | null | void
   >()
+
+  private disposed = false
 
   public readonly onDidChangeTreeData = this._onDidChangeTreeData.event
 
@@ -50,15 +52,25 @@ implements vscode.TreeDataProvider<TreeNode>, vscode.Disposable {
   }
 
   public update(treeData: TreeData): void {
+    if (this.disposed)
+      return
+
     this.treeData = treeData
     this.refresh()
   }
 
   public refresh(): void {
+    if (this.disposed)
+      return
+
     this._onDidChangeTreeData.fire(undefined)
   }
 
   public dispose(): void {
+    if (this.disposed)
+      return
+
+    this.disposed = true
     this._onDidChangeTreeData.dispose()
   }
 }
@@ -67,20 +79,27 @@ export function createTreeItem(treeData: TreeData): TreeNode[] {
   return createTreeItems(treeData)
 }
 
-function createTreeItems(treeData: TreeData, parentId = ''): TreeNode[] {
+const FALLBACK_ID_PREFIX = '__vscode_use_treeprovider__:'
+
+function createTreeItems(treeData: TreeData, parentPath = ''): TreeNode[] {
   return treeData.map((data, index) => {
-    const fallbackId = parentId ? `${parentId}/${index}` : `${index}`
+    const path = parentPath ? `${parentPath}/${index}` : `${index}`
+    const fallbackId = `${FALLBACK_ID_PREFIX}${path}`
     const id = data.id ?? fallbackId
-    const result = create(data, id, getCollapsibleState(data))
+    const result = createNode(data, id, getCollapsibleState(data))
 
     if (data.children?.length)
-      result.children = createTreeItems(data.children, id)
+      result.children = createTreeItems(data.children, path)
 
     return result
   })
 }
 
-export function create(
+export function create(options: CreateOptions): TreeNode {
+  return createNode(options)
+}
+
+function createNode(
   options: CreateOptions,
   fallbackId?: string,
   collapsibleState = getCreateCollapsibleState(options),
@@ -186,9 +205,16 @@ export function renderTree(
       disposable.dispose()
       provider.dispose()
     },
-    update(treeData: TreeData) {
+    update(treeData: TreeData, nextViewId = viewId) {
       if (disposed)
         return
+
+      if (nextViewId !== viewId) {
+        console.warn(
+          'renderTree().update(treeData, viewId) no longer switches views. Create a new tree with renderTree(treeData, viewId) instead.',
+        )
+        return
+      }
 
       provider.update(treeData)
     },
