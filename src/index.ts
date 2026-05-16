@@ -23,6 +23,11 @@ export interface TreeNode extends vscode.TreeItem {
   children?: TreeNode[]
 }
 
+export interface RenderTreeResult extends vscode.Disposable {
+  update(treeData: TreeData): void
+  provider: TreeProvider
+}
+
 export class TreeProvider
 implements vscode.TreeDataProvider<TreeNode>, vscode.Disposable {
   private _onDidChangeTreeData = new vscode.EventEmitter<
@@ -111,7 +116,7 @@ export function create(
     }
   }
 
-  if (iconPath)
+  if (iconPath !== undefined)
     item.iconPath = iconPath
 
   if (tooltip !== undefined)
@@ -163,7 +168,10 @@ export function createIconPath(
   }
 }
 
-export function renderTree(treeData: TreeData, viewId: string) {
+export function renderTree(
+  treeData: TreeData,
+  viewId: string,
+): RenderTreeResult {
   const provider = new TreeProvider(treeData)
   const disposable = vscode.window.registerTreeDataProvider(viewId, provider)
   let disposed = false
@@ -177,15 +185,9 @@ export function renderTree(treeData: TreeData, viewId: string) {
       disposable.dispose()
       provider.dispose()
     },
-    update(treeData: TreeData, nextViewId?: string) {
+    update(treeData: TreeData) {
       if (disposed)
         return
-
-      if (nextViewId && nextViewId !== viewId) {
-        throw new Error(
-          'renderTree().update(treeData, viewId) is no longer supported. Create a new tree with renderTree(treeData, viewId).',
-        )
-      }
 
       provider.update(treeData)
     },

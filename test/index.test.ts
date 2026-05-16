@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import * as vscode from 'vscode'
-import { create, createTreeItem, renderTree } from '../src/index'
+import { TreeProvider, create, createTreeItem, renderTree } from '../src/index'
 import type { TreeData } from '../src/index'
 
 vi.mock('vscode', () => {
@@ -164,6 +164,10 @@ describe('createTreeItem', () => {
 })
 
 describe('create', () => {
+  it('uses explicit id when create is called directly', () => {
+    expect(create({ id: 'item-id', label: 'Item' }).id).toBe('item-id')
+  })
+
   it('uses collapsed option when create is called directly', () => {
     expect(create({ label: 'root', collapsed: true }).collapsibleState).toBe(
       vscode.TreeItemCollapsibleState.Collapsed,
@@ -231,6 +235,20 @@ describe('create', () => {
   })
 })
 
+describe('TreeProvider', () => {
+  it('updates children from new tree data', () => {
+    const provider = new TreeProvider([{ label: 'before' }])
+
+    provider.update([{ label: 'after' }])
+    const children = provider.getChildren() as ReturnType<typeof createTreeItem>
+
+    expect(vscodeMock.fire).toHaveBeenCalledWith(undefined)
+    expect(children[0].label).toBe('after')
+
+    provider.dispose()
+  })
+})
+
 describe('renderTree', () => {
   it('updates provider data without registering a new provider', () => {
     const tree = renderTree([{ label: 'before' }], 'example.view')
@@ -259,23 +277,5 @@ describe('renderTree', () => {
     expect(vscodeMock.eventEmitterDispose).toHaveBeenCalledTimes(1)
     expect(vscodeMock.fire).toHaveBeenCalledTimes(1)
     expect(childrenAfterDispose[0].label).toBe('after')
-  })
-
-  it('keeps the legacy update viewId argument only for the same view', () => {
-    const tree = renderTree([{ label: 'before' }], 'example.view')
-
-    expect(() => tree.update([{ label: 'same' }], 'example.view')).not.toThrow()
-    expect(() => tree.update([{ label: 'next' }], 'next.view')).toThrow(
-      'renderTree().update(treeData, viewId) is no longer supported. Create a new tree with renderTree(treeData, viewId).',
-    )
-
-    const children = tree.provider.getChildren() as ReturnType<
-      typeof createTreeItem
-    >
-
-    expect(vscodeMock.registerTreeDataProvider).toHaveBeenCalledTimes(1)
-    expect(children[0].label).toBe('same')
-
-    tree.dispose()
   })
 })

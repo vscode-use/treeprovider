@@ -77,9 +77,9 @@ interface TreeDataItem {
 
 When items may be reordered, inserted, or renamed, provide an explicit `id`. The fallback id is only stable while the item order and labels stay unchanged.
 
-`renderTree().update(treeData, viewId?)` updates the existing view. The optional `viewId` argument is kept only for compatibility and must match the current view. To use a different `viewId`, create a new tree with `renderTree(treeData, nextViewId)`.
+`renderTree().update(treeData)` updates the existing view. To use a different `viewId`, create a new tree with `renderTree(treeData, nextViewId)`.
 
-The `collapsed` behavior above applies to `renderTree()` and `createTreeItem()`. `create()` is a low-level helper and uses the given `collapsed` option directly.
+The `collapsed` behavior above applies to `renderTree()` and `createTreeItem()`. `create()` is a low-level helper and uses the given `collapsed` option directly. Pass `id` when calling `create()` directly for multiple items that can share the same label.
 
 ## License
 
