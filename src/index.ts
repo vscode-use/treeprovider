@@ -25,7 +25,12 @@ export interface TreeNode extends vscode.TreeItem {
 }
 
 export interface RenderTreeResult extends vscode.Disposable {
-  update(treeData: TreeData, viewId?: string): void
+  update(treeData: TreeData): void
+  /**
+   * @deprecated update() no longer switches views.
+   * Create a new tree with renderTree(treeData, viewId) instead.
+   */
+  update(treeData: TreeData, viewId: string): void
   provider: TreeProvider
 }
 
@@ -80,17 +85,12 @@ export function createTreeItem(treeData: TreeData): TreeNode[] {
   return createTreeItems(treeData)
 }
 
-const FALLBACK_ID_PREFIX = '__vscode_use_treeprovider__:'
-
-function createTreeItems(treeData: TreeData, parentPath = ''): TreeNode[] {
-  return treeData.map((data, index) => {
-    const path = parentPath ? `${parentPath}/${index}` : `${index}`
-    const fallbackId = `${FALLBACK_ID_PREFIX}${path}`
-    const id = data.id ?? fallbackId
-    const result = createNode(data, id, getCollapsibleState(data))
+function createTreeItems(treeData: TreeData): TreeNode[] {
+  return treeData.map((data) => {
+    const result = createNode(data, getCollapsibleState(data))
 
     if (data.children?.length)
-      result.children = createTreeItems(data.children, path)
+      result.children = createTreeItems(data.children)
 
     return result
   })
@@ -102,7 +102,6 @@ export function create(options: CreateOptions): TreeNode {
 
 function createNode(
   options: CreateOptions,
-  fallbackId?: string,
   collapsibleState = getCreateCollapsibleState(options),
 ): TreeNode {
   const {
@@ -120,9 +119,8 @@ function createNode(
 
   item.raw = options
 
-  const itemId = id ?? fallbackId
-  if (itemId !== undefined)
-    item.id = itemId
+  if (id !== undefined)
+    item.id = id
 
   if (command) {
     if (typeof command === 'string') {

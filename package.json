@@ -48,7 +48,7 @@
     "lint:fix": "pnpm run lint --fix",
     "prepublishOnly": "pnpm run build",
     "release": "bumpp && npm publish",
-    "test": "vitest",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

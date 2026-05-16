@@ -144,7 +144,7 @@ describe('createTreeItem', () => {
     ])
   })
 
-  it('uses stable ids for the same input', () => {
+  it('uses explicit ids and leaves missing ids unset', () => {
     const treeData: TreeData = [
       {
         id: 'root-id',
@@ -161,12 +161,12 @@ describe('createTreeItem', () => {
     const second = createTreeItem(treeData)
 
     expect(first[0].id).toBe('root-id')
-    expect(first[0].children?.[0].id).toBe('__vscode_use_treeprovider__:0/0')
+    expect(first[0].children?.[0].id).toBeUndefined()
     expect(second[0].id).toBe(first[0].id)
     expect(second[0].children?.[0].id).toBe(first[0].children?.[0].id)
   })
 
-  it('keeps fallback ids out of the explicit id namespace', () => {
+  it('does not set ids for items without explicit ids', () => {
     const nodes = createTreeItem([
       {
         label: 'root',
@@ -182,34 +182,9 @@ describe('createTreeItem', () => {
       },
     ])
 
-    expect(nodes[0].children?.[0].id).toBe('__vscode_use_treeprovider__:0/0')
+    expect(nodes[0].id).toBeUndefined()
+    expect(nodes[0].children?.[0].id).toBeUndefined()
     expect(nodes[1].id).toBe('0/0')
-  })
-
-  it('keeps fallback ids stable when labels change in the same position', () => {
-    const first = createTreeItem([
-      {
-        label: 'before',
-        children: [
-          {
-            label: 'child before',
-          },
-        ],
-      },
-    ])
-    const second = createTreeItem([
-      {
-        label: 'after',
-        children: [
-          {
-            label: 'child after',
-          },
-        ],
-      },
-    ])
-
-    expect(second[0].id).toBe(first[0].id)
-    expect(second[0].children?.[0].id).toBe(first[0].children?.[0].id)
   })
 })
 
@@ -218,7 +193,7 @@ describe('create', () => {
     expect(create({ id: 'item-id', label: 'Item' }).id).toBe('item-id')
   })
 
-  it('does not create a fallback id when called directly', () => {
+  it('does not set an id when called directly without an explicit id', () => {
     expect(create({ label: 'Item' }).id).toBeUndefined()
   })
 

@@ -62,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 ```ts
 interface TreeDataItem {
-  id?: string // recommended: stable and unique within the tree
+  id?: string // pass a stable, unique id to preserve expansion/selection state
   label: string | vscode.TreeItemLabel
   collapsed?: boolean // true = collapsed, false/undefined = expanded when children exist
   children?: TreeDataItem[]
@@ -76,11 +76,11 @@ interface TreeDataItem {
 }
 ```
 
-The fallback id follows the node position, not the logical item identity. If items can be inserted, removed, sorted, or moved, always provide an explicit `id`; otherwise expansion/selection state may be restored onto the wrong item.
+Items without an explicit `id` leave `item.id` unset. To preserve expansion/selection state across updates, provide a stable and unique `id` for each logical item.
 
 `renderTree().update(treeData)` updates the existing view. The deprecated `update(treeData, viewId)` signature is kept for compatibility, but it no longer switches views. To use a different `viewId`, create a new tree with `renderTree(treeData, nextViewId)`.
 
-The `collapsed` behavior above applies to `renderTree()` and `createTreeItem()`. `create()` creates one item directly and uses the given `collapsed` option directly. It only assigns an id when you pass `id`.
+The `collapsed` behavior above applies to `renderTree()` and `createTreeItem()`. `create()` creates one item directly and uses the given `collapsed` option directly. Items only get an id when you pass `id`.
 
 ## License
 
